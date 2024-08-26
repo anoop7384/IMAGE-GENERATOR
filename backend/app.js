@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { config, uploader } from "cloudinary";
 import OpenAI from "openai";
-//
 const app = express();
 const PORT = 9000;
 
@@ -31,7 +30,7 @@ const gallerySchema = new mongoose.Schema(
 const Gallery = mongoose.model("Gallery", gallerySchema);
 //!Configure openai
 const openai = new OpenAI({
-  apiKey: "",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 //!Configure cloudinary
 config({
