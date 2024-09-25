@@ -4,11 +4,21 @@ import axios from "axios";
 import "./GenerateImage.css";
 import Images from "./Images";
 
-// Function to call the backend API
 const generateImageAPI = async (prompt) => {
-  const res = await axios.post("http://localhost:9000/generate-image", {
-    prompt,
-  });
+  const token = localStorage.getItem("token"); // Get the token from localStorage
+  if (!token) {
+    throw new Error("Unauthorized: No token found");
+  }
+
+  const res = await axios.post(
+    "http://localhost:9000/generate-image",
+    { prompt },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      },
+    }
+  );
   return res.data; // Return the data directly for easier access
 };
 
@@ -31,10 +41,9 @@ const GenerateImage = () => {
   return (
     <>
       <div className="header">
-        <h1 className="title">AI Image Generator using Dalle 3 from OpenAI</h1>
+        <h1 className="title">AI Image Generator</h1>
         <p className="description">
-          Enter a prompt in the input field below to generate a unique image
-          using AI.
+          Enter a prompt in the input field below to generate a unique image.
         </p>
         <p>{mutation.isError && mutation.error.message}</p>
       </div>
@@ -59,7 +68,7 @@ const GenerateImage = () => {
           </div>
         )}
       </div>
-      {/* <Images /> */}
+      <Images />
     </>
   );
 };
