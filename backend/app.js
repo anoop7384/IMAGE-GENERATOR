@@ -52,6 +52,40 @@ app.use(cors(corsOptions));
 //!Middlewares
 
 
+// Function to save a single image from system file to the database
+async function saveSingleImage(filePath, prompt, width, height) {
+  try {
+    // Upload image to Cloudinary with resizing transformation
+    const image = await uploader.upload(filePath, {
+      folder: "ai-art-work",
+      transformation: [
+        {
+          width: width,
+          height: height,
+          crop: "fill", // Crop to fill the specified dimensions
+        }
+      ],
+    });
+
+    // Save image details to MongoDB
+    const imageCreated = await Gallery.create({
+      prompt: prompt, // Modify or add dynamic prompts if needed
+      url: image.secure_url,
+      public_id: image.public_id,
+    });
+
+    console.log(`Saved image: ${filePath}`);
+    // console.log(imageCreated);
+
+    return imageCreated;
+  } catch (error) {
+    console.error("Error saving image to database:", error);
+  }
+}
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
 //!Route
 app.post("/generate-image", auth, async (req, res) => {
   const { prompt } = req.body;
@@ -73,6 +107,8 @@ app.post("/generate-image", auth, async (req, res) => {
       public_id: image.public_id,
     });
     res.json(imageCreated);
+
+
   } catch (error) {
     console.log(error);
     res.json({ message: "Error generating image" });
@@ -82,7 +118,7 @@ app.post("/generate-image", auth, async (req, res) => {
 //!List images route
 app.get("/images", async (req, res) => {
   try {
-    const images = await Gallery.find();
+    const images = await Gallery.find().sort({ _id: -1 });
     res.json(images);
   } catch (error) {
     res.json({ message: "Error fetching images" });

@@ -15,10 +15,11 @@ const generateImageAPI = async (prompt) => {
     { prompt },
     {
       headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+        Authorization: `${token}`, // Include the token in the Authorization header
       },
     }
   );
+  console.log(res);
   return res.data; // Return the data directly for easier access
 };
 
@@ -37,7 +38,7 @@ const GenerateImage = () => {
     }
     mutation.mutate(prompt);
   };
-  console.log(mutation?.data);
+  // console.log(mutation?.data);
   return (
     <>
       <div className="header">
@@ -47,7 +48,15 @@ const GenerateImage = () => {
         </p>
         <p>{mutation.isError && mutation.error.message}</p>
       </div>
-      <div className="container">
+      <div
+        className="container"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <input
           type="text"
           placeholder="Enter prompt"
@@ -63,12 +72,15 @@ const GenerateImage = () => {
           {mutation.isPending ? "Generating..." : "Generate Image"}
         </button>
         {mutation.isSuccess && (
-          <div className="image-container">
-            <img src={mutation.data.url} alt="Generated" />
-          </div>
+          // <div className="image-container">
+          <img
+            src={mutation.data.url}
+            alt="Generated"
+            style={{ width: "200px", height: "200px", marginTop:"50px" }}
+          />
+          // </div>
         )}
       </div>
-      <Images />
     </>
   );
 };

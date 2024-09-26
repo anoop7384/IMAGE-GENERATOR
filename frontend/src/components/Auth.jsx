@@ -8,6 +8,7 @@ function Auth({ onAuthSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [dob, setDob] = useState(""); // Add state for DOB
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -17,11 +18,13 @@ function Auth({ onAuthSuccess }) {
     const url = isLogin
       ? "http://localhost:9000/auth/login"
       : "http://localhost:9000/auth/register";
-    const payload = isLogin ? { email, password } : { name, email, password };
+    const payload = isLogin
+      ? { email, password }
+      : { name, email, password, dob }; // Include DOB in registration payload
 
     try {
       const response = await axios.post(url, payload);
-      
+
       const { token } = response.data;
       console.log(token);
 
@@ -42,16 +45,28 @@ function Auth({ onAuthSuccess }) {
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSubmit} className="auth-form">
           {!isLogin && (
-            <div className="input-group">
-              <label>Name:</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="Enter your name"
-              />
-            </div>
+            <>
+              <div className="input-group">
+                <label>Name:</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="Enter your name"
+                />
+              </div>
+              <div className="input-group">
+                <label>Date of Birth:</label>
+                <input
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  required
+                  placeholder="Enter your date of birth"
+                />
+              </div>
+            </>
           )}
           <div className="input-group">
             <label>Email:</label>
