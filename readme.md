@@ -21,7 +21,7 @@ The AI Image Generator is a web application that allows users to generate images
 
 ## Demo
 
-https://github.com/user-attachments/assets/84301120-3655-4af4-85fd-387d5f7f04dc
+https://github.com/user-attachments/assets/b0678cff-cc77-4cf7-b3da-206eb6679c7a
 
 ## Screenshots
 
