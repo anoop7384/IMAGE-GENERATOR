@@ -13,20 +13,11 @@ const fetchImagesAPI = async () => {
 
   const res = await axios.get("http://localhost:9000/images", {
     headers: {
-      Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      Authorization: `${token}`, // Include the token in the Authorization header
     },
   });
   return res.data;
 };
-
-// const downloadImage = (url) => {
-//   const link = document.createElement("a");
-//   link.href = url;
-//   link.setAttribute("download", "downloadedImage.jpg"); // Provide a filename here
-//   document.body.appendChild(link);
-//   link.click();
-//   document.body.removeChild(link);
-// };
 
 const downloadImage = (fileURL) => {
   fetch(fileURL, {
@@ -87,6 +78,32 @@ const copyUrlToClipboard = async (url) => {
   }
 };
 
+const saveImage = async (imageId) => {
+  const token = localStorage.getItem("token"); // Get the token from localStorage
+  if (!token) {
+    throw new Error("Unauthorized: No token found");
+  }
+  console.log(imageId);
+  try {
+    const response = await axios.post(
+      `http://localhost:9000/api/profile/${imageId}/saveImage`,
+      {
+        headers: {
+          Authorization: `${token}`, // Include the token in the Authorization header
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      console.log("Image saved successfully");
+      alert("Image saved successfully!");
+    }
+  } catch (error) {
+    console.error("Error saving image:", error);
+    alert("Failed to save the image. Please try again.");
+  }
+};
+
 export default function Gallery() {
   const { data } = useQuery({
     queryKey: ["images"],
@@ -94,10 +111,12 @@ export default function Gallery() {
   });
   const [lightboxDisplay, setLightboxDisplay] = React.useState(false);
   const [currentImage, setCurrentImage] = useState("");
+  const [currentImageID, setCurrentImageID] = useState("");
 
-  const openLightbox = (url) => {
+  const openLightbox = (url, id) => {
     setCurrentImage(url);
     setLightboxDisplay(true);
+    setCurrentImageID(id);
   };
 
   const closeLightbox = () => {
@@ -119,7 +138,7 @@ export default function Gallery() {
           <div
             key={index}
             className={`image-container image-${index + 1}`}
-            onClick={() => openLightbox(image.url)}
+            onClick={() => openLightbox(image.url, image.public_id)}
           >
             <img
               src={image.url}
@@ -133,42 +152,48 @@ export default function Gallery() {
       {lightboxDisplay && (
         <div className="lightbox">
           <div className="lightbox-controls">
-            {/* <button
-              className="share-btn"
-              onClick={() => shareImage(currentImage)}
-            >
-              Share
-            </button> */}
             <span className="close-btn" onClick={closeLightbox}>
               &times;
             </span>
             <button
               className="download-btn"
               onClick={() => downloadImage(currentImage)}
+              title="Download Image" // Hover text
             >
               Download
             </button>
             <button
               className="download-btn"
+              onClick={() => saveImage(currentImageID)} // Replace this with your save function
+              title="Save Image" // Hover text
+            >
+              Save {/* Save Icon */}
+            </button>
+            <button
+              className="download-btn"
               onClick={() => shareOnFacebook(currentImage)}
+              title="Share on Facebook" // Hover text
             >
               <i className="fab fa-facebook-f"></i>
             </button>
             <button
               className="download-btn"
               onClick={() => shareOnWhatsApp(currentImage)}
+              title="Share on WhatsApp" // Hover text
             >
               <i className="fab fa-whatsapp"></i>
             </button>
             <button
               className="download-btn"
               onClick={() => shareOnTwitter(currentImage)}
+              title="Share on Twitter" // Hover text
             >
               <i className="fab fa-twitter"></i>
             </button>
             <button
               className="download-btn"
               onClick={() => copyUrlToClipboard(currentImage)}
+              title="Copy URL to Clipboard" // Hover text
             >
               <i className="fas fa-copy"></i>
             </button>

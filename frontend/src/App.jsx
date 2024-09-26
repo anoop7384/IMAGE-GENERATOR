@@ -15,7 +15,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["Authorization"] = `${token}`;
       setIsAuthenticated(true);
     }
   }, []);
@@ -61,28 +61,83 @@ function App() {
         <Auth onAuthSuccess={handleAuthSuccess} />
       ) : (
         <>
-          {/* Navigation Menu */}
-          <nav>
-            <ul>
+          <nav
+            className="navigation-menu"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end", // Aligns the nav to the right
+              alignItems: "center", // Vertically center the items
+              position: "fixed", // Keep it at the top-right corner
+              top: "10px",
+              right: "20px",
+              backgroundColor: "#f8f9fa", // Light background color for contrast
+              padding: "10px 20px", // Add padding around the nav
+              borderRadius: "8px", // Rounded corners for a modern look
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+            }}
+          >
+            <ul
+              className="nav-list"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "15px", // Add space between buttons
+                listStyleType: "none",
+                margin: 0, // Remove default margin
+                padding: 0, // Remove default padding
+              }}
+            >
               <li>
-                <button onClick={() => setCurrentPage("generate")}>Home</button>
+                <button
+                  onClick={() => setCurrentPage("generate")}
+                  style={{
+                    backgroundColor: "#007bff", // Blue color for buttons
+                    color: "#fff", // White text
+                    border: "none",
+                    padding: "8px 16px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Home
+                </button>
               </li>
               <li>
-                <button onClick={() => setCurrentPage("profile")}>
+                <button
+                  onClick={() => setCurrentPage("profile")}
+                  style={{
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    padding: "8px 16px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
+                >
                   Profile
                 </button>
               </li>
 
-              {/* Only show Edit Profile and Logout on the Profile page */}
               {currentPage === "profile" && (
                 <>
                   <li>
-                    <button onClick={() => setCurrentPage("edit-profile")}>
-                      Edit Profile
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        backgroundColor: "#dc3545", // Red color for logout button
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Logout
                     </button>
-                  </li>
-                  <li>
-                    <button onClick={handleLogout}>Logout</button>
                   </li>
                 </>
               )}

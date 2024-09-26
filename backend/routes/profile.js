@@ -28,18 +28,21 @@ router.get("/profile", async (req, res) => {
 
 
 // Add saved image to the user's profile
-router.post("/profile/:userId/saveImage", async (req, res) => {
+router.post("/profile/:imageId/saveImage", async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { imageId } = req.body;
+        const userId = req.user.id;
+        const { imageId } = req.params;
+
+        console.log(userId, imageId);
 
         // Find the user and the image
         const user = await User.findById(userId);
-        const image = await Gallery.findById(imageId);
-
+        const image = await Gallery.findOne({ public_id:imageId });
+        console.log(user, image);
         if (!user || !image) {
             return res.status(404).json({ message: "User or image not found" });
         }
+        
 
         // Add the image to the savedImages array if it's not already saved
         if (!user.savedImages.includes(image._id)) {
@@ -55,27 +58,37 @@ router.post("/profile/:userId/saveImage", async (req, res) => {
 });
 
 // Remove saved image from the user's profile
-router.delete("/profile/:userId/removeImage", async (req, res) => {
+router.delete("/profile/:imageId/removeImage", async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { imageId } = req.body;
+        const userId = req.user.id;
+        const { imageId } = req.params;
 
+        // console.log(userId, imageId);
+
+        // Find the user and the image
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+        const image = await Gallery.findOne({ public_id: imageId });
+        console.log(user, image);
+
+        if (!user || !image) {
+            return res.status(404).json({ message: "User or image not found" });
         }
 
-        // Remove the image from the savedImages array
-        user.savedImages = user.savedImages.filter(
-            (imgId) => imgId.toString() !== imageId
-        );
-        await user.save();
-
-        res.status(200).json({ message: "Image removed successfully" });
+        // Remove the image from the savedImages array if it exists
+        const imageIndex = user.savedImages.indexOf(image._id);
+        console.log(imageIndex);
+        if (imageIndex !== -1) {
+            user.savedImages.splice(imageIndex, 1); // Remove the image
+            await user.save();
+            res.status(200).json({ message: "Image removed successfully" });
+        } else {
+            res.status(404).json({ message: "Image not found in saved images" });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error" });
     }
 });
+
 
 export default router;
